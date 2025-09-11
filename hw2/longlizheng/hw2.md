@@ -22,11 +22,10 @@ Test your knowledge of Julia's syntax and basic conventions.
 
     **Questions:**
     1. What index does Julia use for the first element of an array? (0 or 1)
-    Ans: 1
     2. Write the expression to get elements from index 2 to 4 (inclusive)
-    Ans: A[2:4]
     3. How do you get the last element without knowing the array length?
-    Ans: A[end]
+   
+    Ans: `1`; `A[2:4]`; `A[end]`
 
 2. (Types and Functions) Analyze this Julia code:
 
@@ -46,9 +45,13 @@ Test your knowledge of Julia's syntax and basic conventions.
 
     **Questions:**
     1. What will be the type of `result1` and `result2`?
-    Ans: `typeof(result1) = Float64`, `typeof(result2) = Float64`.
     2. What happens if you call `mystery_function(5, 2)` (integer as second argument)?
-    Ans: Get a ERROR:
+    3. Rewrite the function to accept any numeric types for both parameters
+   
+    Ans: 
+    1. `typeof(result1) = Float64`, `typeof(result2) = Float64`.
+
+    2. Get a ERROR:
    ```julia
    ERROR: MethodError: no method matching mystery_function(::Int64, ::Int64)
    The function `mystery_function` exists, but no method is defined for this combination of argument types.
@@ -61,8 +64,7 @@ Test your knowledge of Julia's syntax and basic conventions.
     [1] top-level scope
       @ REPL[11]:1
    ```
-    3. Rewrite the function to accept any numeric types for both parameters
-    Ans:
+    3. rewritten function:
    ```julia
    function mystery_function(x::Tx, y::Ty) where {Tx<:Number, Ty<:Number}
        r = real(x)
