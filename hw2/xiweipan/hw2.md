@@ -18,7 +18,7 @@
     1. What index does Julia use for the first element of an array? (0 or 1) \
     A: 1
     2. Write the expression to get elements from index 2 to 4 (inclusive) \
-    A: 1
+    A: A[2:4]
     3. How do you get the last element without knowing the array length? \
     A: A[end]
 
