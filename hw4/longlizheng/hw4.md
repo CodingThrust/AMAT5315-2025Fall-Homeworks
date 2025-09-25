@@ -221,3 +221,48 @@ julia> A \ b
     - Compare with the result of the single species spring chain.
 
     Ref: the `hist` function in CairoMakie: https://docs.makie.org/dev/reference/plots/hist
+
+Answer:
+Suppose there are $N$ sites.
+```math
+-m_i \omega^2 u_i = c(u_{i+1} - u_i) - c(u_i - u_{i-1})
+```
+
+results of dual species chain:
+![dual](dual.png "dual")
+
+results of single species chain:
+![single](single.png "single")
+
+we can see clearly that there are two energy bands for dual species chain,
+but only one band for single species chain.
+
+code to reproduce:
+```julia
+using LinearAlgebra
+
+N = 1024
+
+K = zeros(Int, (N, N));
+K[1, 1] = -2; K[1, 2] = 1; K[1, N] = 1;
+K[N, N] = -2; K[N, N-1] = 1; K[N, 1] = 1;
+for i in 2:N-1
+    K[i, i-1] = 1;
+    K[i, i] = -2;
+    K[i, i+1] = 1;
+end
+
+# dual species
+# M = Diagonal(collect(i%2 + 1 for i in 1:N))
+# single species
+M = Diagonal(collect(1 for _ in 1:N))
+
+omega = .√abs.(eigen(K, -M).values)
+
+
+using CairoMakie
+
+f = Figure()
+hist(f[1, 1], omega, bins=N÷16)
+f
+```
