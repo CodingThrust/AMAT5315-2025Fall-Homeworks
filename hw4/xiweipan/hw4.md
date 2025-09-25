@@ -52,3 +52,7 @@ x = A \ b
     - Compare with the result of the single species spring chain.
 
     Ref: the `hist` function in CairoMakie: https://docs.makie.org/dev/reference/plots/hist
+
+    Answer: 
+    
+    #TODO

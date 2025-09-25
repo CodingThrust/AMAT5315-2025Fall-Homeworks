@@ -45,5 +45,4 @@ xlabel!("Year")
 ylabel!("Newborn population (×10^4)")
 title!("HW4 by Xiwei Pan: China Newborn Population")
 
-# Optional: save figure
 savefig(plt, "china_newborn_fit.png")
