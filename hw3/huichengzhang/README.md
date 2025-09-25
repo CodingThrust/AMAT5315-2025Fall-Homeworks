@@ -90,7 +90,7 @@ using MyFirstPackage
 fib(n) = n <= 2 ? 1 : fib(n - 1) + fib(n - 2)
 ```
 
-- 时间复杂度：O(φ^n)，常用上界写作 O(2^n)，指数级。
+- 时间复杂度：$\Theta\left(\left(\frac{1+\sqrt{5}}{2}\right)^n\right)$，即精确的黄金比例φ的n次方。常用上界写作 O(2^n)，指数级。
 - 空间复杂度：O(n)（递归栈深度）。
 
 迭代版本：
