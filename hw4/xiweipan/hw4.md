@@ -54,5 +54,16 @@ x = A \ b
     Ref: the `hist` function in CairoMakie: https://docs.makie.org/dev/reference/plots/hist
 
     Answer: 
-    
-    #TODO
+    ![density of states](density_of_states.png)
+
+    Mainly modified function:
+    ```julia
+    function eigenmodes(e::EigenSystem{T}) where T
+      Ksym = Symmetric(e.K)
+      Mdiag = Diagonal(e.ms)
+      vals, vecs = eigen(Ksym, Mdiag)
+      λ = max.(zero(T), real(vals))
+      frequency = sqrt.(λ)
+      return EigenModes(frequency, vecs)
+   end
+    ```
