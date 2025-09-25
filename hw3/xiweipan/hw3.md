@@ -10,7 +10,7 @@
     ```
     What is the time complexity of this function in Big-O notation?
 
-    Answer: $O(2^n)$.
+    Answer: a rough estimate is $O(2^n)$.
 
     $T(n)=T(n-1)+T(n-2)+O(1)$
 
@@ -23,26 +23,18 @@
     - `C(n) = C(n-1) + C(n-2) + 1`
 
     By induction:
-    $$
-    C(n) = 2F_n - 1
-    $$
+    $C(n) = 2F_n - 1$
     where $F_n$ is the $n$-th Fibonacci number.
 
     From Binet’s formula:
-    $$
-    F_n = \frac{\varphi^n - \psi^n}{\sqrt{5}}, \quad 
-    \varphi = \tfrac{1+\sqrt{5}}{2}, \ |\psi| < 1
-    $$
+    $$F_n = \frac{\varphi^n - \psi^n}{\sqrt{5}}, \quad 
+    \varphi = \tfrac{1+\sqrt{5}}{2}, \ |\psi| < 1$$
 
     Thus:
-    $$
-    F_n = \Theta(\varphi^n), \quad \varphi = \tfrac{1+\sqrt{5}}{2}
-    $$
+    $$F_n = \Theta(\varphi^n), \quad \varphi = \tfrac{1+\sqrt{5}}{2}$$
 
     Final result:
-    $$
-    T(n) = \Theta(F_n) = \Theta(\varphi^n), \quad \varphi = \tfrac{1+\sqrt{5}}{2}
-    $$
+    $$T(n) = \Theta(F_n) = \Theta(\varphi^n), \quad \varphi = \tfrac{1+\sqrt{5}}{2}$$
 
     Now consider this alternative iterative implementation:
     ```julia
