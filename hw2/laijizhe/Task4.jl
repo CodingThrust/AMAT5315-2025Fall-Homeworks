@@ -94,6 +94,8 @@ end
 
 # julia> isconcretetype(Tropical)
 # false
+# julia> isabstracttype(Tropical)
+# false
 # julia> isconcretetype(Tropical{Real})
 # true
 
