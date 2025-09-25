@@ -22,7 +22,7 @@
 
 2. **(Solving Linear Equations)** Solve the following system of linear equations using Julia. Let $x_1, x_2, \ldots, x_5$ be real numbers:
 
-   ```math
+```math
    \begin{align*}
    2x_1 + x_2 - x_3 + 0x_4 + x_5 &= 4, \\
    x_1 + 3x_2 + x_3 - x_4 + 0x_5 &= 6, \\
@@ -30,7 +30,7 @@
    -x_1 + 0x_2 + x_3 + 3x_4 + x_5 &= 5, \\
    x_1 - x_2 + 0x_3 + x_4 + 2x_5 &= 3.
    \end{align*}
-   ```
+```
 
 3. **(Polynomial Data Fitting)** Analyze the newborn population data in China and perform polynomial regression.
 
@@ -102,7 +102,7 @@
     lines!(ax, time, fitted_values, color=:red, label="Fitted Curve")
     
     # Add legend and display
-    axislegend(; position=:rb)
+    axislegend(; position=:lt)
     fig  # Display figure
     save("population_fit.png", fig)  # Save plot
     ```
