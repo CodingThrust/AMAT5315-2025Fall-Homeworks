@@ -106,3 +106,11 @@
     fig  # Display figure
     save("population_fit.png", fig)  # Save plot
     ```
+
+4. **(Extra points: Eigen-decomposition)** Solve the following problem:
+
+    Consider a dual species spring chain, the mass is 1 on even sites and 2 on odd sites, stiffness constant is $C = 1$. The boundary condition is periodic.
+    - Show the density of states at different energy with binned bar plot. The $x$-axis is the energy, the $y$-axis is the population.
+    - Compare with the result of the single species spring chain.
+
+    Ref: the `hist` function in CairoMakie: https://docs.makie.org/dev/reference/plots/hist
