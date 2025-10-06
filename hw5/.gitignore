@@ -1,0 +1,13 @@
+# MNIST cached data
+mnist_data/
+
+# Sample images
+*.png
+*.jpg
+*.jpeg
+
+# Julia temporary files
+*.jl.*.cov
+*.jl.cov
+*.jl.mem
+
