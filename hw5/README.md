@@ -20,7 +20,7 @@
    - How does the reconstruction quality vary with the number of retained singular values?
    - What is the trade-off between compression ratio and image quality?
 
-2. **(Image Processing with Fourier Transform)** Based on the "cat" image that we used in class, perform the following analysis:
+2. **(Image Processing with Fourier Transform)** Based on the ["cat" image](cat.png) that we used in class, perform the following analysis:
 
    **Part A: Edge-Based Frequency Mask**
    - Apply edge detection (check [this youtube video](https://www.youtube.com/watch?app=desktop&v=DGojI9xcCfg)) to the cat image.
