@@ -17,5 +17,5 @@
    - Plot the compression ratio and reconstruction error (e.g., mean squared error or Frobenius norm) as a function of $k$.
 
 2. **(Image Processing with Fourier Transform)** Based on the ["cat" image](cat.png) that we used in class, perform the following analysis:
-   - Compress the image with Fourier transformation in HSV channel (check [this youtube video](https://www.youtube.com/watch?app=desktop&v=DGojI9xcCfg)). Keep only the most significant 1% components (by magnitude) in the Fourier space.
-   - Recover the image, and compare the results with direct compression in RGB channel. Is the result different? explain the observation.
+   - Compress the image with Fourier transformation in HSV channel (check [this youtube video](https://www.youtube.com/watch?app=desktop&v=DGojI9xcCfg)). Keep only the most significant 1% components (by magnitude) in the Fourier space, and then reconstruct the image.
+   - Repeat the same process in the RGB channel, and compare the two reconstructed images. How much are they different? explain the observation.
