@@ -2,7 +2,6 @@
 mnist_data/
 
 # Sample images
-*.png
 *.jpg
 *.jpeg
 
