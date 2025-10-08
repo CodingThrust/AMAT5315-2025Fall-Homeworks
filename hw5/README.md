@@ -14,19 +14,8 @@
    - Compress the dataset by retaining only the top $k$ singular values (experiment with different values of $k$, e.g., $k = 10, 50, 100, 200$).
    - Reconstruct the images from the compressed representation.
    - Visualize and compare the original vs. reconstructed images.
-   - Report the compression ratio and reconstruction error (e.g., mean squared error or Frobenius norm).
-
-   **Discussion:**
-   - How does the reconstruction quality vary with the number of retained singular values?
-   - What is the trade-off between compression ratio and image quality?
+   - Plot the compression ratio and reconstruction error (e.g., mean squared error or Frobenius norm) as a function of $k$.
 
 2. **(Image Processing with Fourier Transform)** Based on the ["cat" image](cat.png) that we used in class, perform the following analysis:
-   - Apply edge detection (check [this youtube video](https://www.youtube.com/watch?app=desktop&v=DGojI9xcCfg)) to the cat image.
-   - Apply Fourier transformation on the edge-detected image.
-   - Keep the most significant 1% components (by magnitude) and create a binary mask $M$.
-   - Apply the mask $M$ to the Fourier transformation of the original image.
-   - Recover the compressed image with the inverse Fourier transformation.
-   - Compare the results with direct compression (keeping the top 1% components from the original image's Fourier transform directly, without using edge detection).
-
-   **Discussion:**
-   - Does edge detection help identify important frequency/singular components?
+   - Compress the image with Fourier transformation in HSV channel (check [this youtube video](https://www.youtube.com/watch?app=desktop&v=DGojI9xcCfg)). Keep only the most significant 1% components (by magnitude) in the Fourier space.
+   - Recover the image, and compare the results with direct compression in RGB channel. Is the result different? explain the observation.
