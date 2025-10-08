@@ -35,4 +35,4 @@ Vulnerability Spectre v1:           Mitigation; usercopy/swapgs barriers and __u
 Vulnerability Spectre v2:           Mitigation; Enhanced / Automatic IBRS, IBPB conditional, RSB filling, PBRSB-eIBRS SW sequence
 Vulnerability Srbds:                Not affected
 Vulnerability Tsx async abort:      Not affected
-2025年 09月 04日 星期四 20:09:41 CST
+2025年 09月 12日 星期五 15:07:38 CST
