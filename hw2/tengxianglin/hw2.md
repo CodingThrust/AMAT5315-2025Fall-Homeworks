@@ -398,8 +398,10 @@ Please open a Julia REPL, run the code above, and answer the following questions
 # one(Tropical{Float64})        -> 0.0ₜ
 # zero(Tropical{Float64})       -> -Infₜ
 # 2) Type: Tropical{Float64}; supertype: AbstractSemiring <: Number
-# 3) Tropical is a parametric type (not concrete uninstantiated)
-# 4) Tropical{Real} is abstract (Real is abstract)
+# 3) Tropical is a parametric struct (not abstract and not concrete); e.g.:
+#    isabstracttype(Tropical) == false, isconcretetype(Tropical) == false, isstructtype(Tropical) == true
+# 4) Tropical{Real} is a concrete type (parameter fully specified); e.g.:
+#    isabstracttype(Tropical{Real}) == false, isconcretetype(Tropical{Real}) == true
 # 5) Matrix multiply (100x100):
 # A = rand(Tropical{Float64},100,100); B = rand(Tropical{Float64},100,100); @btime $A * $B
 # Time: 962.856 μs (3 allocations: 78.21 KiB)
