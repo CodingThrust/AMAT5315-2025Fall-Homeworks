@@ -25,20 +25,6 @@ Test your knowledge of Julia's syntax and basic conventions.
     2. Write the expression to get elements from index 2 to 4 (inclusive)
     3. How do you get the last element without knowing the array length?
 
-**Solution 1.1:**
-```julia
-A = [10, 20, 30, 40, 50]
-first_element  = A[1]
-last_element   = A[end]
-first_three    = A[1:3]
-reverse_order  = A[end:-1:1]
-every_second   = A[1:2:end]
-# Answers:
-# 1) 1-indexed
-# 2) A[2:4]
-# 3) A[end]
-```
-
 2. (Types and Functions) Analyze this Julia code:
 
     ```julia
@@ -59,15 +45,6 @@ every_second   = A[1:2:end]
     1. What will be the type of `result1` and `result2`?
     2. What happens if you call `mystery_function(5, 2)` (integer as second argument)?
     3. Rewrite the function to accept any numeric types for both parameters
-
-**Solution 1.2:**
-```julia
-# result1, result2 :: Float64
-# mystery_function(5, 2) -> MethodError (no Int64, Int64 method)
-function mystery_function(x::T1, y::T2) where {T1<:Number, T2<:Number}
-    x > 0 ? x + y : x - y
-end
-```
 
 ## Task 2: Benchmarking and Profiling
 
