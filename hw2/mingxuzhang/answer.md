@@ -105,10 +105,10 @@ end
    **A:** Type: `Tropical{Float64}`; Supertype: `AbstractSemiring`
 
 3. **Q:** Is `Tropical` a concrete type or an abstract type?
-   **A:** `Tropical` is not concrete (needs parametrization)
+   **A:** Using `isconcretetype(Tropical)` returns `false` and `isabstracttype(Tropical)` returns `false`. `Tropical` is a UnionAll type (type constructor), neither concrete nor abstract until parameterized.
 
 4. **Q:** Is `Tropical{Real}` a concrete type or an abstract type?
-   **A:** Abstract (because `Real` is abstract)
+   **A:** Using `isconcretetype(Tropical{Real})` returns `false` and `isabstracttype(Tropical{Real})` returns `true`. Since `Real` is an abstract type, `Tropical{Real}` is also abstract.
 
 5. **Q:** Write a brief report on the performance of the tropical matrix multiplication.
    **A:** 100×100 tropical matrix multiplication is slower than BLAS-optimized Float64 operations; can be improved with specialized kernels or vectorization packages.
@@ -136,5 +136,7 @@ zero = "-Infₜ"
 type = "Tropical{Float64}"
 supertype = "AbstractSemiring"
 tropical_concrete = false
+tropical_abstract = false
 tropicalReal_concrete = false
+tropicalReal_abstract = true
 ```

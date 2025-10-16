@@ -13,22 +13,17 @@ Test your knowledge of Julia's syntax and basic conventions.
     A = [10, 20, 30, 40, 50]
 
     # Fill in the correct indices/expressions:
-    first_element = A[1]        # Get first element
-    last_element = A[end]       # Get last element  
-    first_three = A[1:3]        # Get first three elements
-    reverse_order = A[end:-1:1] # Get all elements in reverse order
-    every_second = A[1:2:end]   # Get every second element (10, 30, 50)
+    first_element = A[?]        # Get first element
+    last_element = A[?]         # Get last element  
+    first_three = A[?]          # Get first three elements
+    reverse_order = A[?]        # Get all elements in reverse order
+    every_second = A[?]         # Get every second element (10, 30, 50)
     ```
 
     **Questions:**
     1. What index does Julia use for the first element of an array? (0 or 1)
     2. Write the expression to get elements from index 2 to 4 (inclusive)
     3. How do you get the last element without knowing the array length?
-
-    **Answers:**
-    1. 1
-    2. `A[2:4]`
-    3. `A[end]`
 
 2. (Types and Functions) Analyze this Julia code:
 
@@ -51,18 +46,6 @@ Test your knowledge of Julia's syntax and basic conventions.
     2. What happens if you call `mystery_function(5, 2)` (integer as second argument)?
     3. Rewrite the function to accept any numeric types for both parameters
 
-    **Answers:**
-    1. Both `Float64`
-    2. `MethodError` (second arg must be `Float64`)
-    3. Generic version:
-
-    ```julia
-    function mystery_function(x::Real, y::Real)
-        px, py = promote(x, y)
-        return px > 0 ? px + py : px - py
-    end
-    ```
-
 ## Task 2: Benchmarking and Profiling
 
 Learn to measure and analyze performance in Julia.
@@ -74,21 +57,17 @@ Learn to measure and analyze performance in Julia.
 
     # Version 1: Simple loop
     function sum_squares_loop(x::Vector{Float64})
-        total::Float64 = 0.0
-        @inbounds for xi in x
-            total += xi * xi
-        end
-        return total
+        # TODO
     end
 
     # Version 2: Using sum and anonymous function
     function sum_squares_functional(x::Vector{Float64})
-        return sum(xi -> xi * xi, x)
+        # TODO
     end
 
     # Version 3: Using broadcasting
     function sum_squares_broadcast(x::Vector{Float64})
-        return sum(x .^ 2)
+        # TODO
     end
     ```
 
@@ -97,8 +76,6 @@ Learn to measure and analyze performance in Julia.
     2. Create test vector: `x = randn(10000)`
     3. Benchmark each function using `@btime`
     4. Which approach is fastest? Explain why (2-3 sentences)
-
-    Minimal note: Loop/functional avoid temporaries; broadcasting with `.^` may allocate.
 
 2. (Performance Analysis) Analyze this type-unstable function:
 
@@ -121,22 +98,6 @@ Learn to measure and analyze performance in Julia.
     2. Rewrite the function to be type-stable
     3. Benchmark both versions with large n and compare performance
 
-    A type-stable version:
-
-    ```julia
-    function stable_function(n::Int)
-        result::Float64 = 0.0
-        @inbounds for i in 1:n
-            if iseven(i)
-                result += i * 1.0
-            else
-                result += Float64(i)
-            end
-        end
-        return result
-    end
-    ```
-
 ## Task 3: Basic Array Operations
 Practice fundamental array operations that are commonly used in Julia.
 
@@ -144,20 +105,20 @@ Practice fundamental array operations that are commonly used in Julia.
 
     ```julia
     # Create arrays
-    zeros_array = zeros(3, 3)              # Create 3x3 matrix of zeros
-    ones_vector = ones(5)                  # Create vector of 5 ones
-    random_matrix = rand(2, 4)             # Create 2x4 matrix of random numbers
-    range_vector = collect(1:5)            # Create vector [1, 2, 3, 4, 5]
+    zeros_array = ?              # Create 3x3 matrix of zeros
+    ones_vector = ?              # Create vector of 5 ones
+    random_matrix = ?            # Create 2x4 matrix of random numbers
+    range_vector = ?             # Create vector [1, 2, 3, 4, 5]
 
     # Matrix operations
     A = [1 2 3; 4 5 6; 7 8 9]
     B = [1 0 1; 0 1 0; 1 0 1]
 
     # Fill in operations:
-    element_22 = A[2, 2]                   # Get element at row 2, column 2
-    second_row = A[2, :]                   # Get entire second row
-    first_column = A[:, 1]                 # Get entire first column
-    main_diagonal = [A[i, i] for i in 1:size(A, 1)]  # [1, 5, 9]
+    element_22 = ?               # Get element at row 2, column 2
+    second_row = ?               # Get entire second row
+    first_column = ?             # Get entire first column
+    main_diagonal = ?            # Get main diagonal elements [1, 5, 9]
     ```
 
 2. (Broadcasting and Element-wise Operations) Implement functions using Julia's broadcasting:
@@ -167,21 +128,18 @@ Practice fundamental array operations that are commonly used in Julia.
     function apply_function(x::Vector{Float64})
         # Return: a vector whose ith entry is sin(x_i) + cos(2*x_i)
         # Use broadcasting (dot notation)
-        return sin.(x) .+ cos.(2 .* x)
     end
 
     # Function 2: Matrix-scalar operations
     function matrix_transform(A::Matrix{Float64}, c::Float64)
         # Return: a matrix whose (i,j)-entry is (A_ij + c) * 2 - 1
         # Apply this transformation element-wise
-        return (A .+ c) .* 2 .- 1
     end
 
     # Function 3: Element-wise comparison
     function count_positives(x::Vector{Float64})
         # Count how many elements are positive
         # Hint: use broadcasting and sum
-        return sum(x .> 0.0)
     end
     ```
 
@@ -190,8 +148,6 @@ Practice fundamental array operations that are commonly used in Julia.
     2. Implement the three broadcasting functions
     3. Test your functions with sample data
     4. Explain what the `.` (dot) operator does in broadcasting
-
-    Concise: `.` broadcasts element-wise and fuses dotted ops to avoid temporaries.
 
 ## Task 4: (Optional) Design a new algebraic system in Julia
 
@@ -303,14 +259,5 @@ Please open a Julia REPL, run the code above, and answer the following questions
    C = A * B   # please measure the time taken
    ```
    write a brief report on the performance of the tropical matrix multiplication.
-
-    **Answers:**
-    - `Tropical(1.0) + Tropical(3.0)` → `3.0ₜ`
-    - `Tropical(1.0) * Tropical(3.0)` → `4.0ₜ`
-    - `one(Tropical{Float64})` → `0.0ₜ`
-    - `zero(Tropical{Float64})` → `-Infₜ`
-    - Type: `Tropical{Float64}`; Supertype: `AbstractSemiring`
-    - `Tropical` not concrete (needs parametrization); `Tropical{Real}` abstract (`Real` is abstract)
-    - 100×100 tropical matmul has no BLAS, slower; can optimize with vectorization/parallelization.
 
 
