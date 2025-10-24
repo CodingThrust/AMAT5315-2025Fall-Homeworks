@@ -30,5 +30,8 @@
     What is the time complexity of this function in Big-O notation?
 
     ans:
-    For the recursive one, each function call create two function calls, so the complexity is exponential $O(2^n)$.
+
+    For the recursive one, each function call create two function calls, so the complexity is exponential.
+    Assume the complexity is $O(k^n)$, we have $k^n = k^{n-1} + k^{n-2}$, from which we obtain $k=\frac{1+\sqrt{5}}{2}$.
+    
     For the iterative one, the function go through 3 to $n$, so complexity is linear $O(n)$.
