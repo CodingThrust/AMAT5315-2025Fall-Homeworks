@@ -130,7 +130,7 @@ using LinearAlgebra
 zeros_array = zeros(3, 3)       # Create 3x3 matrix of zeros
 ones_vector = ones(5)           # Create vector of 5 ones
 random_matrix = rand(2, 4)      # Create 2x4 matrix of random numbers
-range_vector = 1:5              # Create vector [1, 2, 3, 4, 5]
+range_vector = collect(1:5)              # Create vector [1, 2, 3, 4, 5]
 
 #Matrix operations
 A = [1 2 3; 4 5 6; 7 8 9]
