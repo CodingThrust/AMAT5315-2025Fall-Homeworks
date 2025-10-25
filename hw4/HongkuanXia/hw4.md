@@ -41,15 +41,16 @@ time = [0:1:31;]
 y = [2374,2250,2113,2120,2098,2052,2057,2028,1934,1827,1765,1696,
 1641,1594,1588,1612,1581,1591,1604,1587,1588,1600,1800,1640,1687,
 1655,1786,1723,1523,1465,1200,1062]
-A = hcat(ones(length(t)), t, t.^2)
+A = hcat(ones(length(time)), time, time.^2,time.^3)
 Q, R = qr(A)
 a = R \ (Matrix(Q)' * y)
 ```
 I get the coefficients of the ploynomial are:
 ```math
-a_0 = 2251.8467580213915,\\
-a_1 = -47.82888239606695,\\
-a_2 = 0.7205289373814038.
+a_0 = 2451.5802139037455,\\
+a_1 = -131.88430413372788,\\
+a_2 = 7.6078894850487675,\\
+a_3 = -0.14811528059499704.
 ```
 For visualizing the result, the code is:
 ```julia
@@ -82,6 +83,5 @@ and the figure is:
 The predicted data of the newborn population for 2024 is:
 ```julia-repl
 predict_value = poly(2024-1990)
-1458.596208168018
+940.7111295676092
 ```
-so it is approximately 1459×10⁴
