@@ -6,7 +6,7 @@ For
 ```
   fib(n) = n <= 2 ? 1 : fib(n - 1) + fib(n - 2)
 ```
-time complexity is O(n^2)
+time complexity is $\Theta((\frac{1+\sqrt{5}}{2})^n)$
 
 For 
 ```
