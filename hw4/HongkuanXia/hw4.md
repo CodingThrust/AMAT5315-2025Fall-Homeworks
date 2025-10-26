@@ -85,3 +85,67 @@ The predicted data of the newborn population for 2024 is:
 predict_value = poly(2024-1990)
 940.7111295676092
 ```
+
+4. I compute a spring chain with length 5000, the result for single species spring chain is:
+![](./density_single.png), the code is:
+```julia
+using LinearAlgebra
+using CairoMakie
+M=1.0
+C=1.0
+
+L=5000
+C_matrix = zeros(Float64,L,L)
+for i in 1:L
+    C_matrix[i,i]=-2*C
+    if i == 1
+        C_matrix[i,L]=C
+        C_matrix[i,i+1] = C
+    elseif i==L
+        C_matrix[i,1]=C
+        C_matrix[i,i-1] = C
+    else
+        C_matrix[i,i+1] = C
+        C_matrix[i,i-1]=C
+    end
+    
+end
+evals,evecs = eigen(C_matrix)
+evals = abs.(evals)
+frequency = sqrt.(evals./M)
+max_frequency = maximum(frequency)
+min_frequency = minimum(frequency)
+fig = hist(frequency,bins=range(min_frequency,max_frequency,length = 20))
+save("density_single.png", fig)
+```
+For dual species spring chain, I use the code from ScientificComputingDeoms/SpringSystem:
+```julia
+using SpringSystem
+using SpringSystem: eigenmodes, eigensystem, nv
+using LinearAlgebra
+using Graphs
+
+C = 3.0 
+L = 5000
+M = [isodd(i) ? 1.0 : 2.0 for i in 1:L]
+u0 = 0.2 * randn(L)
+periodic = true
+
+n = length(u0)
+r = SpringSystem.Point.(0.0:n-1)
+dr = SpringSystem.Point.(Float64.(u0))
+v = fill(SpringSystem.Point(0.0), n)
+topology = path_graph(n)
+periodic && add_edge!(topology, n, 1)
+#spring = spring_chain(u0, C, M; periodic=false)
+spring = SpringModel(r, dr, v, topology, fill(C, n), M)
+exact = eigenmodes(eigensystem(spring))
+frequency = exact.frequency
+max_frequency = maximum(frequency)
+min_frequency = minimum(frequency)
+fig = hist(frequency,bins=range(min_frequency,max_frequency,length = 20))
+save("density_dual.png", fig)
+```
+
+and the result is:
+![](./density_dual.png)
