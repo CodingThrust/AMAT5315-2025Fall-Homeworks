@@ -1,4 +1,4 @@
-# Homework 7
+# Homework 8
 
 1. (Einsum notation) Write the einsum notation for the following operations:
     - Matrix multiplication with transpose: $C = A B^T$
@@ -13,5 +13,5 @@
 3. (Partition function) Compute the partition function $Z$ for the AFM (anti-ferromagnetic) Ising model on the Fullerene graph. Please scan the inverse temperature $\beta$ from $0.1$ to $2.0$ with step $0.1$.
   ![](images/c60.svg)
 
-4. (Challenge) Develop a better algorithm to compute the contraction order. If you can beat all algoirthms in [OMEinsumContractionOrders](https://github.com/TensorBFS/OMEinsumContractionOrders), you will get an A+.
-A good starting point is this benchmark repository: https://github.com/TensorBFS/OMEinsumContractionOrdersBenchmark
+4. (Challenge) Develop a better algorithm to compute the contraction order. If you can beat all algoirthms in [OMEinsumContractionOrders.jl](https://github.com/TensorBFS/OMEinsumContractionOrders.jl), you will get an A+.
+A good starting point is this benchmark repository: [OMEinsumContractionOrdersBenchmark](https://github.com/TensorBFS/OMEinsumContractionOrdersBenchmark)
