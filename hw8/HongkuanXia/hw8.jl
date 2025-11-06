@@ -31,3 +31,17 @@ function partition_function_exact(sg::Spinglass, β)
     return Z
 end
 
+fullerene_graph = UnitDiskGraph(fullerene(), sqrt(5)) # construct the unit disk graph
+
+spin_glass = SpinGlass(
+            fullerene_graph,   # graph
+           -ones(Int, ne(fullerene_graph)),     # J, in order of edges
+           zeros(Int, nv(fullerene_graph))     # h, in order of vertices
+       )
+β_list = [0.1:0.1:2.0;]
+Z = zeros(length(β_list))
+
+for i in eachindex(β_list)
+    Z[i] = partition_function_exact(spin_glass,β_list[i])
+end
+

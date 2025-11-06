@@ -17,3 +17,5 @@ First, we contract bags $B_1$ and $B_2$ into $B_3$, yielding an intermediate ten
 ”denotes tensor contraction) with indices $B$ and $E$. Next, we contract bags $B_5$ and $B_6$ into $B_4$,
 producing another intermediate tensor $I_{23} = T_2 ∗ T_3$ also with indices $B$ and $E$. Finally, contracting
 $B_3$ and $B_4$ yields the desired scalar result.
+
+3.
