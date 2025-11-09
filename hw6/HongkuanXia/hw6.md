@@ -60,3 +60,10 @@ vals
   0.17173162534019853
 ```
 Since the degenracy of the zero eigenvalue is the number of the connected component, so the number of connected component of the random 3-regular graph is 1.
+
+3. I write the following code for implementing the restarting lanzcos algorithm, the original code and test code are in "HongkuanXia/hw6_3.jl", and I get the test passed:
+```julia-repl
+Test Summary:      | Pass  Total  Time
+restarting_lanczos |    1      1  0.8s
+Test.DefaultTestSet("restarting_lanczos", Any[], 1, false, false, true, 1.76269782892631e9, 1.762697829736629e9, false, "/Users/hongkuanhisa/amat5135/AMAT5315-2025Fall-Homeworks/hw6/HongkuanXia/hw6_3.jl")
+```
