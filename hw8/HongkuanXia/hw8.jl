@@ -1,4 +1,5 @@
-using Graphs
+using Graphs, Plots, ProblemReductions
+using OMEinsum, OMEinsumContractionOrders
 
 function fullerene()  # construct the fullerene graph in 3D space
     th = (1+sqrt(5))/2
@@ -15,7 +16,7 @@ function fullerene()  # construct the fullerene graph in 3D space
     return res
 end
 
-function partition_function_exact(sg::Spinglass, β)
+function partition_function_exact(sg::SpinGlass, β)
     Z = 0.0
     for σ in Iterators.product(fill([-1, 1], nv(sg.graph))...)
         E = 0.0
@@ -41,7 +42,11 @@ spin_glass = SpinGlass(
 β_list = [0.1:0.1:2.0;]
 Z = zeros(length(β_list))
 
-for i in eachindex(β_list)
-    Z[i] = partition_function_exact(spin_glass,β_list[i])
+@time begin
+    for i in eachindex(β_list)
+        Z[i] = partition_function_tensor(spin_glass, β_list[i])
+    end
 end
 
+plot(β_list, Z, title="partition function for different β", xlabel="β", ylabel="Z")
+savefig("partition.png")
