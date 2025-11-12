@@ -26,5 +26,7 @@
      julia> using Primes; prevprime(60)
      59
      ```
+    
+   Note: by solving this problem, you can get an A+.
 
 [^Achterberg2009]: Achterberg, T., 2009. Constraint Integer Programming.
