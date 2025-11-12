@@ -34,8 +34,3 @@ function random_semiprime(m::Int, n::Int; rng=Random.GLOBAL_RNG, distinct::Bool=
     N = p * q
     return p, q, N
 end
-
-
-# Example usage:
-# results = read_and_factor_file(joinpath(@__DIR__, "data", "numbers_12x12.txt"), SCIP.Optimizer)  # Process all lines
-# results = read_and_factor_file("data/numbers_10x10.txt", SCIP.Optimizer; line_number=1)  # Process only line 1
