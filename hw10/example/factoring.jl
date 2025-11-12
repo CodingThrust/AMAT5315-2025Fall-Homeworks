@@ -1,10 +1,9 @@
 # This script is contributed by Zhongyi Ni
 using ProblemReductions
 using JuMP
-using SCIP
 using Test
 
-function findmin(problem::AbstractProblem,optimizer,tag::Bool)
+function findmin(problem::AbstractProblem, optimizer, tag::Bool, verbose::Bool)
     cons = constraints(problem)
     nsc = ProblemReductions.num_variables(problem)
     maxN = maximum([length(c.variables) for c in cons])
@@ -12,8 +11,9 @@ function findmin(problem::AbstractProblem,optimizer,tag::Bool)
 
     objs = objectives(problem)
 
-    # IP by JuMP
     model = JuMP.Model(optimizer)
+    verbose || set_silent(model)
+    set_string_names_on_creation(model, false)
 
     JuMP.@variable(model, 0 <= x[i = 1:nsc] <= 1, Int)
     
@@ -38,18 +38,38 @@ function findmin(problem::AbstractProblem,optimizer,tag::Bool)
     return round.(Int, JuMP.value.(x))
 end
 
-function factoring(m,n,N)
+"""
+    factoring(m, n, N, optimizer; verbose::Bool=false)
+
+Factorize the number N using the method of Integer Programming.
+
+# Arguments
+- `m`: the number of bit length of the first prime
+- `n`: the number of bit length of the second prime
+- `N`: the semiprime number to factor
+- `optimizer`: the optimizer to use
+
+# Keyword Arguments
+- `verbose`: whether to print the verbose output of the IP solver
+
+# Available Optimizers <: MathOptInterface.AbstractOptimizer
+- SCIP.Optimizer (Open Source)
+- HiGHS.Optimizer (Open Source)
+- Gurobi.Optimizer (Need License)
+- CPLEX.Optimizer (Need License)
+"""
+function factoring(m, n, N, optimizer; verbose::Bool=false)
     fact3 = Factoring(m, n, N)
     res3 = reduceto(CircuitSAT, fact3)
     problem = CircuitSAT(res3.circuit.circuit; use_constraints=true)
-    vals = findmin(problem, SCIP.Optimizer,true)
-    return ProblemReductions.read_solution(fact3, [vals[res3.p]...,vals[res3.q]...])
-end
-@info "Factoring: 1267650600228168602901733704409"
-a,b = factoring(50,50,1267650600228168602901733704409)
-@info "The factors are $a and $b"
-@test BigInt(a)*BigInt(b) == 1267650600228168602901733704409
+    vals = findmin(problem, optimizer, true, verbose)
+    a, b = ProblemReductions.read_solution(fact3, [vals[res3.p]...,vals[res3.q]...])
 
-@info "Factoring: 1146749307995035755805410447651043470398282494584134934736730302757809653488752086493475676497348575363759 (this is expected to stuck!)"
-a,b = factoring(175,175,1146749307995035755805410447651043470398282494584134934736730302757809653488752086493475676497348575363759)
-@test a*b == 1146749307995035755805410447651043470398282494584134934736730302757809653488752086493475676497348575363759
+    if BigInt(a) * BigInt(b) == N
+        @info "✓ Factorization successful! $N = $a * $b"
+        return true, (a, b)
+    else
+        @error "✗ Factorization failed: a*b = $(BigInt(a)*BigInt(b)) != N = $N"
+        return false, (a, b)
+    end
+end
