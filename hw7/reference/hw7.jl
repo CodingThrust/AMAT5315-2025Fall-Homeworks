@@ -209,8 +209,8 @@ function main()
         ["Triangle", "Square", "Diamond"],
         "β (1/Temperature)",
         "Spectral Gap",
-        "Spectral Gap vs Temperature",
-        "spectral_gap_vs_temperature.png"  
+        "hw7/reference/Spectral Gap vs Temperature",
+        "hw7/reference/spectral_gap_vs_temperature.png"  
     )
 
     @info "Spectral Gap vs System Size (β=1.0)"
