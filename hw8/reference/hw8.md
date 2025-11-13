@@ -48,10 +48,17 @@
     - Partition function $$
     Z\equiv \sum_{\vec{\sigma}} e^{-\beta H(\vec{\sigma})}\\
     = \sum_{\vec{\sigma}}e^{-\beta \sum_{(i,j)}\sigma_i \sigma_j}\\
-    =\sum_{\vec{\sigma}}\prod_{(i,j)} e^{-\beta \sigma_i \sigma_j}
-    $$ Summation over all possible configurations $\leftrightarrow$ Regarding $\vec{\sigma}$ as indices and contract all local tensors $$
-    e^{-\beta \sigma_i \sigma_j} = \begin{bmatrix}
+    =\sum_{\vec{\sigma}}\prod_{(i,j)} e^{-\beta \sigma_i \sigma_j}\\
+    =\sum_{\vec{\sigma}}\prod_{(i,j)} h_{\sigma_i, \sigma_j}
+    $$ Summation over all possible configurations $\leftrightarrow$ Regarding $\vec{\sigma}$ as indices and contract all local rank-2 tensors $$
+    \begin{align*}
+    e^{-\beta \sigma_i \sigma_j} &= \begin{bmatrix}
+    h_{\sigma_i=-1, \sigma_j=-1} &h_{\sigma_i=-1, \sigma_j=1}\\
+    h_{\sigma_i=1, \sigma_j=-1} &h_{\sigma_i=1, \sigma_j=1}
+    \end{bmatrix} \\
+    &=\begin{bmatrix}
     e^{-\beta} &e^{\beta}\\
     e^{\beta} &e^{-\beta}
     \end{bmatrix}
+    \end{align*}
     $$
