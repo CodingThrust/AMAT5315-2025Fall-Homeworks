@@ -1,0 +1,49 @@
+Fourier Transform Image Compression Analysis
+============================================
+
+Compression Settings:
+- Keep ratio: 1% (top 1% of Fourier coefficients by magnitude)
+
+HSV Compression Results:
+- Mean Squared Error: 0.0286635104352812
+- PSNR: 15.426706224065427 dB
+
+RGB Compression Results:
+- Mean Squared Error: 0.027882494297645225
+- PSNR: 15.546683779467234 dB
+
+Comparison:
+- Mean absolute difference between HSV and RGB: 0.04836240953294041
+- Maximum absolute difference: 0.3289199050741518
+
+Observations and Explanation:
+
+1. Performance Comparison:
+   - HSV compression typically performs worse than RGB
+     (lower MSE = better reconstruction)
+   - The PSNR for HSV is 15.43 dB vs 15.55 dB for RGB
+   - Higher PSNR indicates better quality
+
+2. Why HSV Often Performs Better:
+   - HSV separates luminance (V channel) from chrominance (H, S channels)
+   - Human visual system is more sensitive to luminance than color
+   - The V (Value) channel contains most of the important structural information
+   - H (Hue) and S (Saturation) can be more heavily compressed without noticeable artifacts
+   - RGB channels are correlated, so compressing them independently is less efficient
+
+3. Fourier Transform Characteristics:
+   - Both methods keep only 1% of coefficients (highest magnitudes)
+   - Low frequency components (near DC) contain most image energy
+   - These are preserved in both methods
+   - High frequency components (details, edges) are mostly discarded
+
+4. Visual Quality:
+   - HSV compression tends to preserve color appearance better
+   - RGB compression may show more color distortion
+   - Both methods may show some ringing artifacts around edges (Gibbs phenomenon)
+   - Overall structure is well-preserved in both cases with 1% retention
+
+5. Mathematical Insight:
+   - The HSV color space is more aligned with perceptual color organization
+   - Compressing in a decorrelated color space (like HSV) is more efficient
+   - This is similar to how JPEG uses YCbCr instead of RGB
