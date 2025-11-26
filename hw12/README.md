@@ -2,6 +2,8 @@
 
 **Note:** Submit your solutions in either `.md` (Markdown) or `.jl` (Julia) format.
 
+**Hint:** To launch a custom kernel function on the GPU, use the `@cuda` macro. To measure GPU execution time and identify performance bottlenecks, wrap your code with `CUDA.@profile` or use `CUDA.@elapsed` for timing individual operations.
+
 1. **(Code Analysis: Performance Anti-patterns)** Analyze the following code snippets and predict their performance characteristics.
 
    **Snippet A:**
