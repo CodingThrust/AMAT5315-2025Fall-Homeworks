@@ -52,12 +52,12 @@ Write the einsum notation for the following operations:
 
 **Einstein Summation Notation**: $D_{ijklmn} = A_{ij} B_{kl} C_{mn}$
 
-**OMEinsum.jl Notation**: `ein"ij,kl,mn->ijklmn"(A, B, C)`
+**OMEinsum.jl Notation**: `reshape(ein"ij,kl,mn->ikmjln"(A, B, C), size(A,1)*size(B,1)*size(C,1), :)`
 
 **Explanation**:
 - Each matrix contributes independent indices
 - No shared indices, so no summation
-- Result is a 6-dimensional tensor with all index combinations
+- The einsum result is a 6-dimensional tensor with indices ordered as $(i,k,m,j,l,n)$, which is then reshaped into a matrix to match the Kronecker product layout
 
 ### 1.5 Verification
 
@@ -105,7 +105,7 @@ The optimal contraction order minimizes:
 2. **Memory usage**: Size of intermediate tensors
 3. **Numerical stability**: Avoiding very large or small intermediate values
 
-**Result**: The analysis in `evaluate.jl` determines the optimal order based on assumed bond dimensions, typically favoring early contraction of tensors with many shared indices.
+**Result**: For the assumed bond dimensions in `evaluate.jl`, **Order 2**, i.e. $((T_1 \cdot T_4) \cdot T_2) \cdot T_3$, has the lowest total cost and is therefore the optimal contraction order.
 
 ---
 

@@ -14,13 +14,16 @@ function simple_einsum(subscripts, arrays...)
         return [sum(arrays[1])]
     elseif subscripts == "ij,ij,ij->ij"
         return arrays[1] .* arrays[2] .* arrays[3]
-    elseif subscripts == "ij,kl,mn->ijklmn"
+    elseif subscripts == "ij,kl,mn->ikmjln"
         A, B, C = arrays
-        result = zeros(size(A)..., size(B)..., size(C)...)
+        result = zeros(
+            size(A, 1), size(B, 1), size(C, 1),
+            size(A, 2), size(B, 2), size(C, 2),
+        )
         for i in 1:size(A,1), j in 1:size(A,2)
             for k in 1:size(B,1), l in 1:size(B,2)
                 for m in 1:size(C,1), n in 1:size(C,2)
-                    result[i,j,k,l,m,n] = A[i,j] * B[k,l] * C[m,n]
+                    result[i,k,m,j,l,n] = A[i,j] * B[k,l] * C[m,n]
                 end
             end
         end
@@ -92,18 +95,18 @@ println("   Verification: ", isapprox(D1, D2))
 
 println("\n4. Kronecker product: D = A ⊗ B ⊗ C")
 println("   Einsum notation: D[i,j,k,l,m,n] = A[i,j] * B[k,l] * C[m,n]")
-println("   Simple einsum: simple_einsum(\"ij,kl,mn->ijklmn\", A, B, C)")
+println("   Simple einsum (Kronecker layout): reshape(permutedims(simple_einsum(\"ij,kl,mn->ikmjln\", A, B, C), (3,2,1,6,5,4)), size(A,1)*size(B,1)*size(C,1), :) )")
 
 # Example
 A = rand(2, 3)
 B = rand(2, 2)
 C = rand(3, 2)
 D1 = kron(kron(A, B), C)  # Standard Julia (flattened)
-D2 = simple_einsum("ij,kl,mn->ijklmn", A, B, C)  # Einsum (6D tensor)
-# For verification, we check the structure is correct
+T = simple_einsum("ij,kl,mn->ikmjln", A, B, C)  # Einsum (6D tensor with TA index order)
+D2 = reshape(permutedims(T, (3,2,1,6,5,4)), size(A,1)*size(B,1)*size(C,1), :)
 println("   D1 size: ", size(D1))
 println("   D2 size: ", size(D2))
-println("   Verification: Kronecker product structure implemented correctly")
+println("   Verification (D1 ≈ D2): ", isapprox(D1, D2))
 
 # ============================================================================
 # Problem 2: Optimal Contraction Order
@@ -427,7 +430,7 @@ println("1. Einsum Notation:")
 println("   - Matrix multiplication with transpose: ein\"ik,jk->ij\"")
 println("   - Sum all elements: ein\"ij->\"")
 println("   - Element-wise multiplication: ein\"ij,ij,ij->ij\"")
-println("   - Kronecker product: ein\"ij,kl,mn->ijklmn\"")
+println("   - Kronecker product: reshape(ein\"ij,kl,mn->ikmjln\", size(A,1)*size(B,1)*size(C,1), :)")
 println()
 println("2. Optimal Contraction Order: $optimal_order")
 println()
