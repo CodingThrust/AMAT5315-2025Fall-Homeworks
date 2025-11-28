@@ -1,7 +1,7 @@
-# Homework 3
+ # Homework 3
 
 ## 1. Package Creation
-https://github.com/Zzero76/MyFirstPackage.jl.git
+https://github.com/Zzero76/MyFirstPackage.jl.git 
 
 ## 2. Big-O Analysis
 2.1 Recursive Fibonacci function:
@@ -17,7 +17,7 @@ n=25, time=0.000286435 seconds
 n=30, time=0.003199794 seconds
 n=35, time=0.035541253 seconds
 
-time complexity: O(2^n)
+Time Complexity:  Θ(((1+√5)/2)^n)
 
 
 2.2 Iterate Fibonacci function:

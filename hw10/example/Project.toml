@@ -1,0 +1,6 @@
+[deps]
+JuMP = "4076af6c-e467-56ae-b986-b466b2749572"
+Primes = "27ebfcd6-29c5-5fa9-bf4b-fb8fc14df3ae"
+ProblemReductions = "899c297d-f7d2-4ebf-8815-a35996def416"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+SCIP = "82193955-e24f-5292-bf16-6f2c5261a85f"
