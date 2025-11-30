@@ -1,0 +1,69 @@
+┌ Warning: fail to load Revise.
+└ @ Main ~/.julia/config/startup.jl:4
+============================================================
+Problem 1: Gradient Descent on Himmelblau's Function
+============================================================
+Converged at iteration 78
+
+Starting point 1: [0.0, 0.0]
+  Final point: [3.0, 2.0]
+  Final function value: 0.0
+Converged at iteration 84
+
+Starting point 2: [5.0, 5.0]
+  Final point: [3.0, 2.0]
+  Final function value: 0.0
+Converged at iteration 27
+
+Starting point 3: [-5.0, 5.0]
+  Final point: [-2.805118, 3.131313]
+  Final function value: 0.0
+Converged at iteration 76
+
+Starting point 4: [5.0, -5.0]
+  Final point: [3.584428, -1.848127]
+  Final function value: 0.0
+Converged at iteration 22
+
+Starting point 5: [-5.0, -5.0]
+  Final point: [-3.77931, -3.283186]
+  Final function value: 0.0
+Converged at iteration 72
+
+Starting point 6: [1.0, 1.0]
+  Final point: [3.0, 2.0]
+  Final function value: 0.0
+Converged at iteration 22
+
+Starting point 7: [-4.0, -4.0]
+  Final point: [-3.77931, -3.283186]
+  Final function value: 0.0
+Converged at iteration 60
+
+Starting point 8: [4.0, -2.0]
+  Final point: [3.584428, -1.848127]
+  Final function value: 0.0
+
+============================================================
+Known global minima (all with f = 0):
+  (3, 2)
+  (-2.805118, 3.131312)
+  (-3.779310, -3.283186)
+  (3.584428, -1.848126)
+============================================================
+
+Convergence plot saved to problem1_convergence.png
+
+============================================================
+Summary of Results:
+============================================================
+Starting Point       | Final Point                    | f(x,y)
+------------------------------------------------------------
+(0.0, 0.0)           | (3.0, 2.0)                     | 0.0
+(5.0, 5.0)           | (3.0, 2.0)                     | 0.0
+(-5.0, 5.0)          | (-2.8051, 3.1313)              | 0.0
+(5.0, -5.0)          | (3.5844, -1.8481)              | 0.0
+(-5.0, -5.0)         | (-3.7793, -3.2832)             | 0.0
+(1.0, 1.0)           | (3.0, 2.0)                     | 0.0
+(-4.0, -4.0)         | (-3.7793, -3.2832)             | 0.0
+(4.0, -2.0)          | (3.5844, -1.8481)              | 0.0
