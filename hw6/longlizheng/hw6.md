@@ -81,13 +81,29 @@
    using Graphs, Random, KrylovKit
    Random.seed!(42)
    g = random_regular_graph(100000, 3)
-   # your code here
+   
+   A = laplacian_matrix(g)
+   q = randn(nv(g))
+   vals, _, _ = eigsolve(A, q, 5, :SR)
    ```
 
    **Requirements:**
    - Use the relationship between zero eigenvalues and connected components
    - Implement eigenvalue computation with `KrylovKit.jl`
    - Report the number of connected components found
+
+Ans:
+code is implemented as above, which gives results:
+```julia
+julia> vals
+5-element Vector{Float64}:
+ -2.469722951009431e-15
+  0.1717316253401988
+  0.17216583440834107
+  0.17267946627399564
+  0.17299784606514
+```
+Thus, there is one connected component.
 
 2. **(Restarting Lanczos Algorithm)** Implement a restarting Lanczos algorithm to find the largest eigenvalue of a Hermitian matrix. The algorithm works as follows:
 
@@ -100,3 +116,76 @@
    - Implement the restarting Lanczos tridiagonalization as a Julia function
    - Include a test demonstrating your implementation works correctly
    - Document your function with clear comments explaining each step
+
+Ans:
+```julia
+using SparseArrays, LinearAlgebra
+
+"""
+restarting_lanczos(A, q::AbstractVector{T}; s::Int=20, maxiter::Int=20,abstol::Real=1e-10 ) -> (Real,Vector)
+Restarting Lanczos algorithm to find the largest eigen-value of a Hermitian matrix.
+The restatring lanczos algorithm builds an orthonormal basis for the Krylov subspace
+K_m(A, q) = span{q, Aq, A²q, ..., A^(m-1)q} and produces a tridiagonal
+matrix T that approximates A in this subspace.
+
+# Arguments:
+- `A`: Hermitian matrix (can be sparse)
+- `q::AbstractVector`: Initial vector
+- `s::Int`: Number of Lanczos iteration steps per restart (default: 20)
+- `maxiter::Int`: Maximum number of iterations
+- `abstol::Real`: Absolute tolerance (default: 1e-10)
+
+# Returns:
+- maximal eigenvalue of A
+
+"""
+function restarting_lanczos(A, q::AbstractVector{T}; s::Int=20, maxiter::Int=100, abstol::Real=1e-8) where T
+    _s = min(length(q), s)
+    normalize!(q)
+
+    basis = zeros(T, length(q), _s)
+    basis[:,1] .= q
+    α = zeros(T, _s)
+    α[1] = q' * A * q
+
+    rk = A * q - α[1] * q
+    β = zeros(T, _s - 1)
+    nrk = norm(rk)
+    β[1] = nrk
+
+    for iter in 1:maxiter
+        for k = 2:_s
+            basis[:,k] .= rk ./ β[k-1]
+            Aq_k = A * basis[:,k]
+            α[k] = basis[:,k]' * Aq_k
+            rk = Aq_k -  α[k] * basis[:,k] - β[k-1] * basis[:,k-1]
+            nrk = norm(rk)
+            if abs(nrk) < abstol
+                return eigen(SymTridiagonal(α, β)).values[end]
+            end
+            if k < _s
+                β[k] = nrk
+            end
+        end
+        if iter == maxiter
+            return eigen(SymTridiagonal(α, β)).values[end]
+        end
+        Ts =  basis' * A * basis
+        u1 = eigen(Ts).vectors[:,end]
+        basis[:,1] = normalize(basis * u1)
+        α[1] = basis[:,1]' * (A * basis[:,1])
+        rk = A * basis[:,1] - α[1] * basis[:,1]
+        β[1] = norm(rk)
+    end
+
+    return eigen(SymTridiagonal(α, β)).values[end]
+end
+
+
+using Test
+@testset "restarting_lanczos" begin
+    A = Symmetric(rand(100,100))
+    q1 = randn(100)
+    @test restarting_lanczos(A,q1) ≈ eigen(A).values[end]
+end
+```
