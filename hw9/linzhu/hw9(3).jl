@@ -1,78 +1,146 @@
-using OMEinsum
+###########################################################
+# greedy_mis_experiment.jl
+#
+# (Greedy Algorithm) Maximum Independent Set on
+# random 3-regular graphs and approximation ratio scaling.
+###########################################################
+
 using Graphs
-using ProblemReductions   # only for UnitDiskGraph / fullerene construction
+using Random
+using JuMP
+using HiGHS
+import MathOptInterface as MOI
 
-############################
-# 1. Fullerene graph
-############################
+###########################################################
+# 1. Greedy MIS algorithm
+###########################################################
 
-function fullerene()
-    th = (1 + sqrt(5)) / 2
-    res = NTuple{3,Float64}[]
-    for (x, y, z) in ((0.0, 1.0, 3th),
-                      (1.0, 2 + th, 2th),
-                      (th, 2.0, 2th + 1.0))
-        for (a, b, c) in ((x,y,z), (y,z,x), (z,x,y))
-            for loc in ((a,b,c), (a,b,-c), (a,-b,c), (a,-b,-c),
-                        (-a,b,c), (-a,b,-c), (-a,-b,c), (-a,-b,-c))
-                if loc ∉ res
-                    push!(res, loc)
-                end
-            end
+"""
+    greedy_max_independent_set(g::SimpleGraph, rng::AbstractRNG) -> Vector{Int}
+
+Simple random greedy algorithm for MIS:
+
+    S = ∅
+    R = V(G)
+    while R ≠ ∅:
+        pick a random v ∈ R
+        add v to S
+        remove v and all neighbors N(v) from R
+
+Returns the independent set S as a vector of vertex indices.
+"""
+function greedy_max_independent_set(g::SimpleGraph, rng::AbstractRNG)
+    remaining = Set(vertices(g))
+    indep = Int[]
+
+    while !isempty(remaining)
+        v = rand(rng, collect(remaining))  # pick random vertex from remaining set
+        push!(indep, v)
+
+        delete!(remaining, v)
+        for u in neighbors(g, v)
+            delete!(remaining, u)
         end
     end
-    return res
+
+    return indep
 end
 
-fullerene_graph = UnitDiskGraph(fullerene(), sqrt(5))
-@info "fullerene_graph" nv(fullerene_graph) ne(fullerene_graph)
-# should be 60 vertices, 90 edges
+###########################################################
+# 2. Exact MIS size via MILP (JuMP + HiGHS)
+###########################################################
 
-############################
-# 2. Build einsum code
-############################
+"""
+    exact_mis_size(g::SimpleGraph) -> Int
 
-# Each edge (i,j) is a 2×2 tensor W_{σ_i, σ_j}.
-# The Einstein code uses the vertex indices as labels.
-edges_list = collect(edges(fullerene_graph))
+Exact maximum independent set size via 0–1 MILP:
 
-code = EinCode([[src(e), dst(e)] for e in edges_list], Int[])
-optcode = optimize_code(code, uniformsize(code, 2), TreeSA())
+    maximize  ∑ x_i
+    subject to x_i + x_j ≤ 1  for each edge (i,j),
+              x_i ∈ {0,1}.
+"""
+function exact_mis_size(g::SimpleGraph)
+    n = nv(g)
 
-############################
-# 3. AFM Ising edge tensor
-############################
+    model = Model(HiGHS.Optimizer)
+    MOI.set(model, MOI.Silent(), true)
 
-# AFM Ising, J = -1, zero field:
-#
-# H_edge = σ_i σ_j
-# weight w(σ_i,σ_j) = exp(-β H_edge)
-#
-# σ_i σ_j = +1 (aligned)      -> exp(-β)
-# σ_i σ_j = -1 (anti-aligned) -> exp(+β)
-#
-# With spin basis ( +1, -1 ) ≡ (1, 2) indices, we get
-#     W = [ e^{-β}  e^{β}
-#           e^{β}   e^{-β} ]
+    @variable(model, x[1:n], Bin)
+    @objective(model, Max, sum(x[i] for i in 1:n))
 
-function edge_tensor(β)
-    return [exp(-β)  exp(β);
-            exp(β)   exp(-β)]
+    for e in edges(g)
+        i, j = src(e), dst(e)
+        @constraint(model, x[i] + x[j] <= 1)
+    end
+
+    optimize!(model)
+    return Int(round(objective_value(model)))
 end
 
-# For this homogeneous model every edge uses the same tensor.
-sitetensors(β) = fill(edge_tensor(β), ne(fullerene_graph))
+###########################################################
+# 3. Experiment driver
+###########################################################
 
-############################
-# 4. Partition function Z(β)
-############################
+"""
+    experiment_greedy_MIS(; n_trials=5)
 
-partition_func(β) = only(optcode(sitetensors(β)...))
+For n = 10,20,...,200 (where a 3-regular graph exists), generate
+`n_trials` random 3-regular graphs, compute:
 
-βs = 0.1:0.1:2.0
-Zs = [partition_func(β) for β in βs]
+  - greedy_size = |MIS_greedy|
+  - opt_size    = |MIS_opt|
 
-println("β\tZ")
-for (β, Z) in zip(βs, Zs)
-    println("$(round(β, digits=1))\t$Z")
+and print averages and approximation ratio:
+
+  avg_ratio = avg_greedy / avg_opt
+"""
+function experiment_greedy_MIS(; n_trials::Int = 5)
+    global_rng = MersenneTwister(5315)
+
+    println("n\tavg_greedy\tavg_opt\tapprox_ratio")
+
+    for n in 10:10:200
+        # For a d-regular graph to exist, n*d must be even. For d=3, that means n must be even.
+        if isodd(3n)
+            continue
+        end
+
+        total_greedy = 0.0
+        total_opt    = 0.0
+
+        for _ in 1:n_trials
+            # Each trial uses a fresh seed to keep graphs different
+            seed = rand(global_rng, 1:10^9)
+            rng  = MersenneTwister(seed)
+
+            g = random_regular_graph(n, 3; seed=seed)
+
+            greedy_set  = greedy_max_independent_set(g, rng)
+            greedy_size = length(greedy_set)
+
+            opt_size = exact_mis_size(g)
+
+            total_greedy += greedy_size
+            total_opt    += opt_size
+        end
+
+        avg_greedy = total_greedy / n_trials
+        avg_opt    = total_opt / n_trials
+        ratio      = avg_greedy / avg_opt
+
+        println("$(lpad(n,3))\t$(round(avg_greedy, digits=2))\t\t$(round(avg_opt, digits=2))\t$(round(ratio, digits=3))")
+    end
 end
+
+###########################################################
+# 4. Main
+###########################################################
+
+function main()
+    println("Greedy MIS on random 3-regular graphs")
+    println("=====================================")
+    experiment_greedy_MIS(n_trials = 5)
+end
+
+# Run immediately when this file is executed
+main()
