@@ -332,6 +332,192 @@ function solve_problem2_size()
 end
 
 # ============================================================================
+# Problem 3 (Challenge): Parallel Tempering for Spin Glass
+# ============================================================================
+
+"""
+SpinGlass type to match GenericTensorNetworks interface
+"""
+struct SpinGlass
+    graph::SimpleGraph
+    coupling::Vector{Float64}  # J_ij for each edge
+    bias::Vector{Float64}      # h_i for each vertex
+end
+
+"""
+Compute energy for a spin glass configuration
+"""
+function energy(sg::SpinGlass, spins::Vector{Int})
+    E = 0.0
+    # Coupling terms
+    for (idx, e) in enumerate(edges(sg.graph))
+        E += sg.coupling[idx] * spins[src(e)] * spins[dst(e)]
+    end
+    # Bias terms
+    for i in 1:length(spins)
+        E += sg.bias[i] * spins[i]
+    end
+    return E
+end
+
+"""
+Parallel Tempering algorithm for spin glass ground state finding
+"""
+function parallel_tempering(sg::SpinGlass;
+                           n_replicas=16,
+                           T_min=0.1,
+                           T_max=10.0,
+                           n_sweeps=10000,
+                           swap_interval=10,
+                           seed=42)
+    Random.seed!(seed)
+    n = nv(sg.graph)
+    
+    # Temperature ladder (geometric spacing)
+    temperatures = [T_min * (T_max/T_min)^(i/(n_replicas-1)) for i in 0:(n_replicas-1)]
+    βs = 1.0 ./ temperatures
+    
+    # Initialize random configurations for each replica
+    replicas = [rand([-1, 1], n) for _ in 1:n_replicas]
+    energies = [energy(sg, replicas[i]) for i in 1:n_replicas]
+    
+    # Track best configuration
+    best_energy = minimum(energies)
+    best_config = copy(replicas[argmin(energies)])
+    
+    # Statistics
+    n_swaps_attempted = 0
+    n_swaps_accepted = 0
+    
+    for sweep in 1:n_sweeps
+        # Perform Monte Carlo updates for each replica
+        for r in 1:n_replicas
+            β = βs[r]
+            spins = replicas[r]
+            E = energies[r]
+            
+            # Multiple single-spin flips per sweep
+            for _ in 1:n
+                # Random spin flip
+                i = rand(1:n)
+                spins[i] *= -1
+                E_new = energy(sg, spins)
+                
+                # Metropolis criterion
+                ΔE = E_new - E
+                if ΔE < 0 || rand() < exp(-β * ΔE)
+                    E = E_new
+                    if E < best_energy
+                        best_energy = E
+                        best_config = copy(spins)
+                    end
+                else
+                    # Reject: flip back
+                    spins[i] *= -1
+                end
+            end
+            
+            energies[r] = E
+        end
+        
+        # Attempt replica exchanges
+        if sweep % swap_interval == 0
+            for r in 1:(n_replicas-1)
+                # Try to swap replicas r and r+1
+                β1, β2 = βs[r], βs[r+1]
+                E1, E2 = energies[r], energies[r+1]
+                
+                # Exchange probability
+                Δβ = β2 - β1
+                ΔE = E2 - E1
+                accept_prob = exp(Δβ * ΔE)
+                
+                n_swaps_attempted += 1
+                if rand() < accept_prob
+                    # Swap configurations
+                    replicas[r], replicas[r+1] = replicas[r+1], replicas[r]
+                    energies[r], energies[r+1] = energies[r+1], energies[r]
+                    n_swaps_accepted += 1
+                end
+            end
+        end
+        
+        # Progress reporting
+        if sweep % 1000 == 0 || sweep == n_sweeps
+            swap_rate = n_swaps_accepted / max(n_swaps_attempted, 1)
+            println("  Sweep $sweep: Best E = $best_energy, Swap rate = $(round(swap_rate, digits=3))")
+        end
+    end
+    
+    println("\nFinal statistics:")
+    println("  Total swaps attempted: $n_swaps_attempted")
+    println("  Total swaps accepted: $n_swaps_accepted")
+    println("  Overall swap rate: $(round(n_swaps_accepted/n_swaps_attempted, digits=3))")
+    
+    return best_config, best_energy
+end
+
+"""
+Helper functions from README for constructing test cases
+"""
+function strong_product(g1::SimpleGraph, g2::SimpleGraph)
+    vs = [(v1, v2) for v1 in vertices(g1), v2 in vertices(g2)]
+    graph = SimpleGraph(length(vs))
+    for (i, vi) in enumerate(vs), (j, vj) in enumerate(vs)
+        if (vi[1] == vj[1] && has_edge(g2, vi[2], vj[2])) ||
+                (vi[2] == vj[2] && has_edge(g1, vi[1], vj[1])) ||
+                (has_edge(g1, vi[1], vj[1]) && has_edge(g2, vi[2], vj[2]))
+            add_edge!(graph, i, j)
+        end
+    end
+    return graph
+end
+
+strong_power(g::SimpleGraph, k::Int) = k == 1 ? g : strong_product(g, strong_power(g, k - 1))
+
+function spin_glass_c(n::Int, k::Int)
+    g1 = cycle_graph(n)
+    g = strong_power(g1, k)
+    coupling = fill(1.0, ne(g))
+    bias = [1.0 - degree(g, i) for i in vertices(g)]
+    return SpinGlass(g, coupling, bias)
+end
+
+function solve_problem3()
+    println("\n" * "="^70)
+    println("Problem 3 (Challenge): Parallel Tempering for Spin Glass")
+    println("="^70)
+    
+    # Test case 1: smaller problem for verification
+    println("\n[Test 1] Spin glass on C5^2 (5-cycle to 2nd power)")
+    println("-"^70)
+    sg1 = spin_glass_c(5, 2)
+    println("Graph: $(nv(sg1.graph)) vertices, $(ne(sg1.graph)) edges")
+    println("Target energy: -85")
+    
+    config1, E1 = parallel_tempering(sg1, n_replicas=12, T_min=0.5, T_max=15.0,
+                                     n_sweeps=5000, swap_interval=10)
+    
+    println("\nResult: Energy = $E1")
+    println(E1 == -85 ? "✓ Test 1 PASSED!" : "✗ Test 1 FAILED (expected -85)")
+    
+    # Test case 2: challenge problem
+    println("\n\n[Test 2] Spin glass on C7^4 (7-cycle to 4th power) - CHALLENGE")
+    println("-"^70)
+    sg2 = spin_glass_c(7, 4)
+    println("Graph: $(nv(sg2.graph)) vertices, $(ne(sg2.graph)) edges")
+    println("Target energy: < -93855")
+    
+    config2, E2 = parallel_tempering(sg2, n_replicas=20, T_min=0.3, T_max=20.0,
+                                     n_sweeps=20000, swap_interval=10)
+    
+    println("\nResult: Energy = $E2")
+    println(E2 < -93855 ? "✓ Test 2 PASSED! A+ achieved!" : "✗ Test 2 FAILED (need < -93855)")
+    
+    return (E1, E2)
+end
+
+# ============================================================================
 # Main execution
 # ============================================================================
 
@@ -350,14 +536,18 @@ function main()
     # Problem 2b
     sizes, gaps_size = solve_problem2_size()
     
+    # Problem 3 (Challenge)
+    E1, E2 = solve_problem3()
+    
     println("\n" * "="^70)
     println("Summary")
     println("="^70)
-    println("✓ Problem 1: Ground state energy found")
+    println("✓ Problem 1: Ground state energy found (E = $ground_energy)")
     println("✓ Problem 2a: Spectral gap vs temperature analyzed")
     println("✓ Problem 2b: Spectral gap vs system size analyzed")
-    println("\nNote: Problem 3 (Challenge) requires implementing parallel tempering.")
-    println("This is an advanced algorithm for A+ credit.")
+    println("✓ Problem 3: Parallel tempering implemented")
+    println("    Test 1 (C5^2): E = $E1 " * (E1 == -85 ? "✓" : "✗"))
+    println("    Test 2 (C7^4): E = $E2 " * (E2 < -93855 ? "✓ A+!" : "✗"))
     println("="^70)
 end
 
