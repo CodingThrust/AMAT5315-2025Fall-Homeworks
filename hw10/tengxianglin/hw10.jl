@@ -1,5 +1,7 @@
 # Homework 10 Solutions
 # Author: tengxianglin
+#
+# Run with: julia --project=hw10 hw10/tengxianglin/hw10.jl
 
 using Graphs
 using Printf

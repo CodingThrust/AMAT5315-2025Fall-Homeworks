@@ -1,5 +1,7 @@
 # Homework 11 Solutions
 # Author: tengxianglin
+#
+# Run with: julia --project=hw11 hw11/tengxianglin/hw11.jl
 
 using LinearAlgebra
 using Printf
@@ -380,6 +382,14 @@ function main()
 end
 
 # Run if this file is executed directly
-if abspath(PROGRAM_FILE) == @__FILE__
-    main()
+# This will execute main() when the file is run as: julia hw11.jl
+# The condition checks if this file is the main script being executed
+if !isempty(PROGRAM_FILE)
+    # Compare normalized absolute paths
+    if abspath(PROGRAM_FILE) == abspath(@__FILE__)
+        main()
+    # Also check by filename in case paths differ slightly
+    elseif endswith(PROGRAM_FILE, "hw11.jl") || basename(PROGRAM_FILE) == "hw11.jl"
+        main()
+    end
 end

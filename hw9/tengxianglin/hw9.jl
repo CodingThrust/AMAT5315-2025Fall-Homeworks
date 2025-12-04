@@ -1,5 +1,7 @@
 # Homework 9 Solutions
 # Author: tengxianglin
+#
+# Run with: julia --project=hw9 hw9/tengxianglin/hw9.jl
 
 using Graphs
 using LinearAlgebra

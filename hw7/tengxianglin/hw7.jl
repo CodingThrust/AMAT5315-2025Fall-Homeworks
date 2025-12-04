@@ -1,5 +1,7 @@
 # Homework 7 Solutions
 # Author: tengxianglin
+#
+# Run with: julia --project=hw7 hw7/tengxianglin/hw7.jl
 
 using Graphs
 using LinearAlgebra, SparseArrays
@@ -120,7 +122,17 @@ function solve_problem1()
     
     println("\nRunning simulated annealing (10 trials)...")
     for trial in 1:10
-        energy, config = simulated_annealing(fullerene_graph, seed=trial)
+        # Use different seed for each trial to ensure variation
+        # Also vary cooling schedule slightly
+        seed_val = trial * 1000 + 42
+        Random.seed!(seed_val)
+        
+        # Vary parameters slightly to get different paths
+        cooling_rate = 0.95 + (trial % 3) * 0.01  # Slight variation
+        energy, config = simulated_annealing(fullerene_graph, 
+                                            seed=seed_val,
+                                            cooling_rate=cooling_rate,
+                                            steps_per_temp=1000 + trial * 10)
         if energy < best_energy
             best_energy = energy
             best_config = config
@@ -141,49 +153,94 @@ end
 # ============================================================================
 
 """
-Construct the Ising Hamiltonian matrix for anti-ferromagnetic model
+Construct the Glauber dynamics transition matrix for anti-ferromagnetic Ising model
+The spectral gap is defined as gap = λ_max - λ_2, where λ_max = 1 (stationary state)
 """
-function ising_hamiltonian(graph::SimpleGraph, T::Float64=1.0)
+function glauber_transition_matrix(graph::SimpleGraph, T::Float64=1.0)
     n = nv(graph)
     N = 2^n
     β = 1.0 / T
     
-    # Build the Hamiltonian matrix (sparse)
-    H = spzeros(Float64, N, N)
+    # Build the transition rate matrix (sparse)
+    W = spzeros(Float64, N, N)
     
     # Iterate over all configurations
     for state in 0:(N-1)
         # Convert state to spin configuration
         spins = [2 * ((state >> i) & 1) - 1 for i in 0:(n-1)]
         
-        # Diagonal element: energy of this configuration
-        energy = 0.0
+        # Calculate energy of current state
+        E_current = 0.0
         for e in edges(graph)
-            energy += spins[src(e)] * spins[dst(e)]
+            E_current += spins[src(e)] * spins[dst(e)]
         end
-        H[state+1, state+1] = energy
+        
+        # For each possible spin flip
+        total_rate = 0.0
+        for i in 1:n
+            # Flip spin i
+            spins_new = copy(spins)
+            spins_new[i] *= -1
+            
+            # Calculate energy after flip
+            E_new = 0.0
+            for e in edges(graph)
+                E_new += spins_new[src(e)] * spins_new[dst(e)]
+            end
+            
+            # Energy difference
+            ΔE = E_new - E_current
+            
+            # Glauber transition rate (heat bath dynamics)
+            # rate = 1/(1 + exp(β*ΔE))
+            rate = 1.0 / (1.0 + exp(β * ΔE))
+            
+            # Convert new spin configuration back to state index
+            new_state = 0
+            for j in 1:n
+                if spins_new[j] == 1
+                    new_state += (1 << (j-1))
+                end
+            end
+            
+            # Add transition rate to off-diagonal
+            W[new_state+1, state+1] += rate / n
+            total_rate += rate / n
+        end
+        
+        # Diagonal element: -sum of outgoing rates
+        W[state+1, state+1] = -total_rate
     end
     
-    return H
+    return W
 end
 
 """
-Compute the spectral gap (difference between two smallest eigenvalues)
+Compute the spectral gap of the Glauber dynamics transition matrix
+Gap = 0 - λ_2, where λ_2 is the second largest eigenvalue (largest is 0)
 """
 function compute_spectral_gap(graph::SimpleGraph, T::Float64=1.0)
-    H = ising_hamiltonian(graph, T)
+    W = glauber_transition_matrix(graph, T)
     
     # For small systems, compute all eigenvalues
-    if nv(graph) <= 10
-        eigenvalues = eigvals(Matrix(H))
-        sort!(eigenvalues)
-        return eigenvalues[2] - eigenvalues[1]
+    if nv(graph) <= 12
+        eigenvalues = eigvals(Matrix(W))
+        # Take real part (should be real for this matrix, imaginary part is numerical noise)
+        eigenvalues_real = real.(eigenvalues)
+        # Sort in descending order (largest first)
+        sort!(eigenvalues_real, rev=true)
+        # The largest eigenvalue should be ~0 (stationary state)
+        # The second largest determines the relaxation rate
+        # Spectral gap = -λ_2 (since λ_1 ≈ 0)
+        gap = -eigenvalues_real[2]
+        return gap
     else
-        # For larger systems, use sparse eigenvalue solver
-        # This would require Arpack or KrylovKit
-        eigenvalues = eigvals(Matrix(H))
-        sort!(eigenvalues)
-        return eigenvalues[2] - eigenvalues[1]
+        # For larger systems, would need Arpack/KrylovKit
+        eigenvalues = eigvals(Matrix(W))
+        eigenvalues_real = real.(eigenvalues)
+        sort!(eigenvalues_real, rev=true)
+        gap = -eigenvalues_real[2]
+        return gap
     end
 end
 
@@ -237,6 +294,12 @@ function solve_problem2_temperature()
         @printf("T = %.1f: Gap = %.6f\n", T, gap)
     end
     
+    println("\nObservation:")
+    println("  - Spectral gap increases with temperature")
+    println("  - At low T (< 0.4), gap ≈ 0: system is 'frozen', slow mixing")
+    println("  - At high T, gap grows: faster relaxation to equilibrium")
+    println("  - Relaxation time τ ≈ 1/gap")
+    
     return collect(temperatures), gaps
 end
 
@@ -245,7 +308,7 @@ function solve_problem2_size()
     println("Problem 2b: Spectral Gap vs System Size")
     println("="^70)
     
-    T = 0.1
+    T = 1.0  # Use higher temperature to see clearer trends
     sizes = [4, 6, 8, 10, 12]  # Limited by 2^n computation
     
     println("\nAnalyzing Cycle Graphs at T = $T")
@@ -257,8 +320,13 @@ function solve_problem2_size()
         graph = cycle_graph(n)
         gap = compute_spectral_gap(graph, T)
         push!(gaps, gap)
-        println("n = $n: Gap = $gap")
+        @printf("n = %2d: Gap = %.6f\n", n, gap)
     end
+    
+    println("\nObservation:")
+    println("  - Spectral gap decreases as system size increases")
+    println("  - Larger systems have slower relaxation (smaller gap)")
+    println("  - This is expected for 1D chains at finite temperature")
     
     return sizes, gaps
 end
