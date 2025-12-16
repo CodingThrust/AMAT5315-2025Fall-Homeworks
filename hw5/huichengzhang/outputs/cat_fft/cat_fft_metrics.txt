@@ -1,0 +1,9 @@
+Cat FFT Compression (keep 1.0% coefficients)
+MSE original→RGB: 9.294165e-03 (R=9.822826e-03, G=9.534890e-03, B=8.524780e-03)
+MSE original→HSV: 1.394364e-02 (R=9.825909e-03, G=2.340563e-02, B=8.599374e-03)
+MSE RGB↔HSV:     4.958313e-03 (R=2.834884e-05, G=1.421781e-02, B=6.287800e-04)
+
+Observation:
+- HSV 通道分离了亮度与色度，固定保留比例下，通常比直接在 RGB 通道分别截断频谱更少出现彩色振铃与偏色，亮度结构更稳定。
+- 若 MSE(original→HSV) < MSE(original→RGB)，说明 HSV 方案在色彩/亮度方面更稳健；若相反，则说明该图在 RGB 各通道频谱更集中。
+- 可结合 cat_diff_rgb_vs_hsv.png 的差异图观察两种重建的局部差异分布（越亮差异越大）。
