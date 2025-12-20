@@ -1,3 +1,0 @@
-using OMEinsum
-
-eincode = "ab,"
