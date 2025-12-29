@@ -1,0 +1,4 @@
+config,time_seconds
+baseline,2.464924
+tuned,1.399402
+speedup,1.761412
